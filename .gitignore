@@ -1,2 +1,5 @@
 data/WeeBit/
+data/weebit.csv
+data/weebit_train.csv
+data/weebit_test.csv
 .ipynb_checkpoints
