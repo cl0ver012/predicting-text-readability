@@ -9,9 +9,11 @@ import pandas as pd
 # for tokenization
 import spacy
 
-
 # the following spacy model has to be downloaded
 SPACY_MODEL = "en_core_web_sm"
+
+
+# WORDS AND SENTENCES
 
 
 def _get_words(x):
@@ -41,7 +43,7 @@ def words_and_sentences(df):
     df['Tokens'] = df['Text'].apply(lambda x: nlp(x))
     
     # get words
-    df['Words'] = df['Tokens'].apply(lambda x: _get_words(x))
+    df['Words'] = df['Tokens'].apply(_get_words)
     
     # get sentences
     df['Sentences'] = df['Tokens'].apply(lambda x: list(x.sents))
@@ -53,8 +55,30 @@ def words_and_sentences(df):
     df['N_sentences'] = df['Sentences'].apply(lambda x: len(x))
     
     return df
-  
 
-def total_syllables(df):
+
+# SYLLABLES   
+
+
+def _count_hyphens(text, dic):
+    return dic.inserted(text).count("-")
+
+
+def syllables(df):
     """Get total number of syllables in text."""
+    
+    # get pyphen dictionary
+    dic = pyphen.Pyphen(lang='en_EN')
+    
+    # use pyphen to find the number of hyphens (example: sentence -> sent-ence, 1 hyphen)
+    df["N_hyphens"] = df["Text"].apply(lambda x: _count_hyphens(x, dic))
+    
+    # number of syllables is number of hyphens + number of words 
+    # (example: sentence -> sent-ence = 1 hyphen + 1 word = 2 syllables)
+    df["N_syllables"] = df["N_words"] + df["N_hyphens"]
+    
+    # we don't need the number of hyphens anymore
+    df.drop(columns=["N_hyphens"], inplace=True)
+    
+    return df
     
