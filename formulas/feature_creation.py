@@ -9,6 +9,9 @@ import pandas as pd
 # for tokenization
 import spacy
 
+# for finding number of syllables
+import pyphen
+
 # the following spacy model has to be downloaded
 SPACY_MODEL = "en_core_web_sm"
 
@@ -25,7 +28,7 @@ def words_and_sentences(df):
     """
     Uses spacy to find number of words and sentences for each text.
     
-    Added features:
+    Adds features:
     Tokens: all tokens in the text
     Words: all words in the text
     Sentences: all sentences in the text
@@ -65,7 +68,18 @@ def _count_hyphens(text, dic):
 
 
 def syllables(df):
-    """Get total number of syllables in text."""
+    """
+    Get total number of syllables in text for each text.
+    
+    Needs features:
+    N_words
+    
+    Adds features:
+    N_syllables: total number of syllables in the text
+    
+    :param: the dataframe with the dataset
+    :returns: the dataframe with the added feature
+    """
     
     # get pyphen dictionary
     dic = pyphen.Pyphen(lang='en_EN')
@@ -81,4 +95,49 @@ def syllables(df):
     df.drop(columns=["N_hyphens"], inplace=True)
     
     return df
+
+
+# PERCENTAGE OF DIFFICULT WORDS (DALE-CHALL)
+
+
+def _get_dale_chall_easy_words():
+    easy_words = set()
     
+    with open("resources/dale_chall_easy_word_list.txt") as file:
+        lines = [line.rstrip('\n') for line in file]
+        
+        for line in lines:
+            easy_words.add(line.lower())
+    
+    return easy_words
+
+
+def _get_num_difficult_words(text, easy_words):
+    n = 0
+    for word in text:
+        if word.lower() not in easy_words:
+            n += 1
+    return n
+
+
+def difficult_words_pct(df):
+    """
+    Get percentage of difficult words as required for Dale-Chall formula. 
+    Word is counted as difficult if it's not in Dale-Chall easy word list.
+    
+    Needs features:
+    Words
+    N_words
+    
+    Adds features:
+    Difficult_word_percent - percentage of difficult words (Dale-Chall)
+    
+    :param: the dataframe with the dataset
+    :returns: the dataframe with the added feature
+    """
+    
+    easy_words = _get_dale_chall_easy_words()
+    
+    df["Difficult_word_percent"] = df["Words"].apply(lambda x: _get_num_difficult_words(x, easy_words)) / df["N_words"]
+    
+    return df
