@@ -46,4 +46,28 @@ def dale_chall(df):
     # Dale-Chall formula
     df["Dale_Chall"] = 0.1579 * (df["Difficult_word_percent"] * 100) + 0.0496 * (df["N_words"] / df["N_sentences"])
     
+    # adjust if percentage of difficul words is greater than 5%
+    if df["Difficult_word_percent"] > 0.05:
+        df["Dale_Chall"] += 3.6365 
+        
+    return df
+
+
+def gunning_fog(df):
+    """
+    Calculates the Gunning fog formula for each text.
+    The formula and its interpretation is given in this wiki page: https://en.wikipedia.org/wiki/Gunning_fog_index
+    
+    Needed features:
+    N_words
+    N_sentences
+    Complex_words_percent
+    
+    Adds column:
+    Gunning_fog - Gunning fog score for the text 
+    """
+
+    # Gunning fog formula
+    df["Gunning_fog"] = 0.4 * (df["N_words"] / df["N_sentences"] + 100 * df["Complex_word_percent"])
+    
     return df

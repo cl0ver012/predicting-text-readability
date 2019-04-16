@@ -141,3 +141,48 @@ def difficult_words_pct(df):
     df["Difficult_word_percent"] = df["Words"].apply(lambda x: _get_num_difficult_words(x, easy_words)) / df["N_words"]
     
     return df
+
+
+# PERCENTAGE OF COMPLEX WORDS (GUNNING FOG)
+
+
+def _count_complex_words(words, dic):
+    n_complex = 0
+    
+    for word in words:
+        # if the word has more than 3 or more syllables it will have 2 or more hyphens
+        if dic.inserted(word).count("-") >= 2:
+            n_complex += 1
+    
+    return n_complex
+
+
+def complex_words_pct(df):
+    """
+    Get percentage of complex words as defined by Gunning.
+    Complex words are those with three or more syllables.
+    
+    Needs features:
+    Words
+    N_words
+    
+    Adds features:
+    Complex_word_percent: percentage of complex words (Gunning)
+    
+    :param: the dataframe with the dataset
+    :returns: the dataframe with the added feature
+    """
+    
+    # get pyphen dictionary
+    dic = pyphen.Pyphen(lang='en_EN')
+    
+    # use pyphen to find the number of complex words
+    df["N_complex_words"] = df["Words"].apply(lambda x: _count_complex_words(x, dic))
+    
+    # get percentage
+    df["Complex_word_percent"] = df["N_complex_words"] / df["N_words"]
+    
+    # we don't need the number of complex words anymore
+    df.drop(columns=["N_complex_words"], inplace=True)
+    
+    return df
