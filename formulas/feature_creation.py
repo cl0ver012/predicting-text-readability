@@ -143,10 +143,10 @@ def difficult_words_pct(df):
     return df
 
 
-# PERCENTAGE OF COMPLEX WORDS (GUNNING FOG)
+# POLYSYLLABLES (WORDS WITH 3 OR MORE SYLLABLES)
 
 
-def _count_complex_words(words, dic):
+def _count_polysyllables(words, dic):
     n_complex = 0
     
     for word in words:
@@ -157,17 +157,16 @@ def _count_complex_words(words, dic):
     return n_complex
 
 
-def complex_words_pct(df):
+def polysyllables(df):
     """
-    Get percentage of complex words as defined by Gunning.
-    Complex words are those with three or more syllables.
+    Get total number of polysyllables in text for each text.
+    A polysyllable is a word with 3 or more syllables.
     
     Needs features:
     Words
-    N_words
     
     Adds features:
-    Complex_word_percent: percentage of complex words (Gunning)
+    N_polysyllables: total number of polysyllables in the text
     
     :param: the dataframe with the dataset
     :returns: the dataframe with the added feature
@@ -176,13 +175,32 @@ def complex_words_pct(df):
     # get pyphen dictionary
     dic = pyphen.Pyphen(lang='en_EN')
     
-    # use pyphen to find the number of complex words
-    df["N_complex_words"] = df["Words"].apply(lambda x: _count_complex_words(x, dic))
+    # use pyphen to find the number of polysyllables
+    df["N_polysyllables"] = df["Words"].apply(lambda x: _count_polysyllables(x, dic))
     
+    return df
+
+
+# PERCENTAGE OF COMPLEX WORDS (GUNNING FOG)
+
+
+def complex_words_pct(df):
+    """
+    Get percentage of complex words as defined by Gunning.
+    Complex words (or polysyllables) are those with three or more syllables.
+    
+    Needs features:
+    N_polysyllables
+    N_words
+    
+    Adds features:
+    Complex_word_percent: percentage of complex words (Gunning)
+    
+    :param: the dataframe with the dataset
+    :returns: the dataframe with the added feature
+    """
+     
     # get percentage
-    df["Complex_word_percent"] = df["N_complex_words"] / df["N_words"]
-    
-    # we don't need the number of complex words anymore
-    df.drop(columns=["N_complex_words"], inplace=True)
+    df["Complex_word_percent"] = df["N_polysyllables"] / df["N_words"]
     
     return df

@@ -5,8 +5,18 @@ All functions take a pandas dataframe as an input.
 To work, required features listed in the description for each formula are needed.
 The wanted features can be created using the feature_creation module.
 
+Formulas implemented:
+- Flesch formula
+- Dale-Chall formula
+- Gunning fog index
+- SMOG grade
+
 The functions will calculate the formula for every text in the dataframe, creating a column with the result.
 """
+import numpy as np
+
+
+# FLESCH 
 
 
 def flesch(df):
@@ -29,6 +39,9 @@ def flesch(df):
     return df
 
 
+# DALE-CHALL
+
+
 def dale_chall(df):
     """
     Calculates the Dale-Chall formula for each text.
@@ -47,10 +60,12 @@ def dale_chall(df):
     df["Dale_Chall"] = 0.1579 * (df["Difficult_word_percent"] * 100) + 0.0496 * (df["N_words"] / df["N_sentences"])
     
     # adjust if percentage of difficul words is greater than 5%
-    if df["Difficult_word_percent"] > 0.05:
-        df["Dale_Chall"] += 3.6365 
+    df.loc[df["Difficult_word_percent"] > 0.05, "Dale_Chall"] += 3.6365
         
     return df
+
+
+# GUNNING FOG
 
 
 def gunning_fog(df):
@@ -69,5 +84,29 @@ def gunning_fog(df):
 
     # Gunning fog formula
     df["Gunning_fog"] = 0.4 * (df["N_words"] / df["N_sentences"] + 100 * df["Complex_word_percent"])
+    
+    return df
+
+
+# SMOG
+
+
+def smog(df):
+    """
+    Calculates the Smog grade for each text.
+    The formula and its interpretation is given in this wiki page: https://en.wikipedia.org/wiki/SMOG
+    
+    Needed features:
+    N_sentences
+    N_polysyllables
+    
+    Adds column:
+    Smog - Smog grade for the text 
+    """
+
+    # Smog formula
+    df["Smog"] = df["N_polysyllables"] * 30 / df["N_sentences"]
+    df["Smog"] = df["Smog"].apply(np.sqrt)
+    df["Smog"] = 1.0430 * df["Smog"] + 3.1291
     
     return df
