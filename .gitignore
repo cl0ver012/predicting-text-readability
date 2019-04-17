@@ -2,4 +2,6 @@ data/WeeBit/
 data/weebit.csv
 data/weebit_train.csv
 data/weebit_test.csv
+features/weebit_train_with_features.csv
+**/__pycache__/
 .ipynb_checkpoints
