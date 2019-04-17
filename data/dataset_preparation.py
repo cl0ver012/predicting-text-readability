@@ -114,7 +114,8 @@ def clean_weebit(df):
     :returns: Cleaned dataframe
     """
     
-    # remove None values
+    # convert to string, remove None values
+    df['Text'] = df['Text'].astype(str)
     df.dropna(inplace=True)
     
     # replace all newlines with spaces
@@ -133,6 +134,7 @@ def clean_weebit(df):
     # remove non-content lines
     df['Text'] = df['Text'].apply(_remove_non_content_lines)
     
+    df['Text'] = df['Text'].astype(str)
     df.reset_index(drop=True, inplace=True)
     return df
 
