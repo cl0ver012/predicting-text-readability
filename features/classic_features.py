@@ -15,6 +15,10 @@ List of classic features:
 - Long_word_percent
 - Avg_letters_per_word
 - Comma_percent
+- Proper_noun_percent
+- Noun_percent
+- Pronoun_percent
+- Conj_percent
 
 List of Auxillary features (features used to calculate other features):
 - Tokens
@@ -363,3 +367,57 @@ def comma_pct(df):
     df["Comma_percent"] = df["Sentences"].apply(_get_n_comma_sent) / df["N_sentences"]
     
     return df
+
+
+# PART OF SPEECH FEATURES
+
+
+def _get_n_pos(tokens, pos_list):
+    n = 0
+    for token in tokens:
+        for pos in pos_list:
+            if token.pos_ == pos:
+                n += 1
+    return n
+
+
+def pos_features(df):
+    """
+    Gets several part-of-speech features:
+    1) Percentage of nouns and proper nouns.
+    2) Percentage of proper nouns
+    3) Percentage of pronouns
+    4) Percentage of conjunctions
+    
+    Needs features:
+    Tokens
+    N_words
+    
+    Adds features
+    Noun_percent: percentage of nouns and proper nouns
+    Proper_noun_percent: percentage of proper nouns
+    Pronoun_percent: percentage of pronouns
+    Conj_percent: percentage of conjunctions
+    
+    :param: the dataframe with the dataset
+    :returns: the dataframe with the added feature
+    """
+    
+    # nouns + proper nouns percentage
+    pos_list = ["NOUN", "PROPN"]
+    df["Noun_percent"] = df["Tokens"].apply(lambda x: _get_n_pos(x, pos_list)) / df["N_words"]
+    
+    # proper nouns percentage
+    pos_list = ["PROPN"]
+    df["Proper_noun_percent"] = df["Tokens"].apply(lambda x: _get_n_pos(x, pos_list))/ df["N_words"]
+    
+    # pronouns percentage
+    pos_list = ["PRON"]
+    df["Pronoun_percent"] = df["Tokens"].apply(lambda x: _get_n_pos(x, pos_list)) / df["N_words"]
+    
+    # conjunctions percentage
+    pos_list = ["CONJ", "CCONJ"]
+    df["Conj_percent"] = df["Tokens"].apply(lambda x: _get_n_pos(x, pos_list)) / df["N_words"]
+    
+    return df
+
