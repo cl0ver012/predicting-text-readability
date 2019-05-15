@@ -3,6 +3,28 @@ Functions for creation of commonly used text readability features.
 
 All functions take a pandas dataframe as an input. The dataframe contains texts in the Text column.
 The functions will calculate the feature for every text in the dataframe, creating a column for the feature.
+
+To work, some functions need auxillary features; requirements for each function are written in its description.
+
+List of classic features:
+- Avg_words_per_sentence
+- Avg_syllables_per_word
+- Complex_word_percent
+- Difficult_word_percent
+- Long_sent_percent
+- Long_word_percent
+- Avg_letters_per_word
+- Comma_percent
+
+List of Auxillary features (features used to calculate other features):
+- Tokens
+- Words
+- Sentences
+- N_words
+- N_sentences
+- N_syllables
+- N_polysyllables
+
 """
 import pandas as pd
 
@@ -29,6 +51,9 @@ def words_and_sentences(df):
     Uses spacy to find number of words and sentences for each text.
     
     Adds features:
+    Avg_words_per_sentence: average number of words per sentence
+    
+    Adds auxillary features:
     Tokens: all tokens in the text
     Words: all words in the text
     Sentences: all sentences in the text
@@ -57,6 +82,9 @@ def words_and_sentences(df):
     # get number of sentences
     df['N_sentences'] = df['Sentences'].apply(lambda x: len(x))
     
+    # also get average word number per sentence
+    df["Avg_words_per_sentence"] = df["N_words"] / df["N_sentences"]
+    
     return df
 
 
@@ -75,10 +103,13 @@ def syllables(df):
     N_words
     
     Adds features:
+    Avg_syllables_per_word: average number of syllables per word
+    
+    Adds auxillary features:
     N_syllables: total number of syllables in the text
     
     :param: the dataframe with the dataset
-    :returns: the dataframe with the added feature
+    :returns: the dataframe with the added features
     """
     
     # get pyphen dictionary
@@ -90,6 +121,9 @@ def syllables(df):
     # number of syllables is number of hyphens + number of words 
     # (example: sentence -> sent-ence = 1 hyphen + 1 word = 2 syllables)
     df["N_syllables"] = df["N_words"] + df["N_hyphens"]
+    
+    # also write average syllable number per word
+    df["Avg_syllables_per_word"] = df["N_syllables"] / df["N_words"]
     
     # we don't need the number of hyphens anymore
     df.drop(columns=["N_hyphens"], inplace=True)
@@ -165,7 +199,7 @@ def polysyllables(df):
     Needs features:
     Words
     
-    Adds features:
+    Adds auxillary features:
     N_polysyllables: total number of polysyllables in the text
     
     :param: the dataframe with the dataset
@@ -202,5 +236,130 @@ def complex_words_pct(df):
      
     # get percentage
     df["Complex_word_percent"] = df["N_polysyllables"] / df["N_words"]
+    
+    return df
+
+
+# PERCENTAGE OF LONG SENTENCES (LONGER THAN 25 WORDS)
+
+
+def _get_n_long_sent(sentences):
+    n = 0
+    for sentence in sentences:
+        if len(sentence) > 25:
+            n += 1
+    return n
+
+
+def long_sent_pct(df):
+    """
+    Get percentage of long sentences.
+    Long sentences are defined as having more than 25 words.
+    
+    Needs features:
+    Sentences
+    
+    Adds features:
+    Long_sent_percent: percentage of long sentences
+    
+    :param: the dataframe with the dataset
+    :returns: the dataframe with the added feature
+    """
+    
+    # get percentage
+    df["Long_sent_percent"] = df["Sentences"].apply(_get_n_long_sent) / df["N_sentences"]
+    
+    return df
+
+
+# PERCENTAGE OF LONG WORDS (LONGER THAN 8 CHARACTERS)
+
+
+def _get_n_long_word(words):
+    n = 0
+    for word in words:
+        if len(word) > 8:
+            n += 1
+    return n
+
+
+def long_word_pct(df):
+    """
+    Get percentage of long words.
+    Long words are defined as having more than 8 chars.
+    
+    Needs features:
+    Words
+    
+    Adds features:
+    Long_word_percent: percentage of long words
+    
+    :param: the dataframe with the dataset
+    :returns: the dataframe with the added feature
+    """
+    
+    # get percentage
+    df["Long_word_percent"] = df["Words"].apply(_get_n_long_word) / df["N_words"]
+    
+    return df
+
+
+# AVERAGE NUMBER OF LETTERS PER WORD
+
+
+def _get_n_letters(words):
+    n = 0
+    for word in words:
+        n += len(word)
+    return n
+
+
+def avg_letters_per_word(df):
+    """
+    Get average number of letters per word.
+    
+    Needs features:
+    Words
+    
+    Adds features:
+    Avg_letters_per_word
+    
+    :param: the dataframe with the dataset
+    :returns: the dataframe with the added feature
+    """
+    
+    # get percentage
+    df["Avg_letters_per_word"] = df["Words"].apply(_get_n_letters) / df["N_words"]
+    
+    return df
+
+
+# PERCENTAGE OF SENTENCES WITH A COMA
+
+
+def _get_n_comma_sent(sentences):
+    n = 0
+    for sentence in sentences:
+        if str(sentence).find(",") != -1:
+            n += 1
+    return n
+
+
+def comma_pct(df):
+    """
+    Get percentage of sentences with a comma.
+    
+    Needs features:
+    Sentences
+    
+    Adds features:
+    Comma_percent: percentage of sentences with a comma
+    
+    :param: the dataframe with the dataset
+    :returns: the dataframe with the added feature
+    """
+    
+    # get percentage
+    df["Comma_percent"] = df["Sentences"].apply(_get_n_comma_sent) / df["N_sentences"]
     
     return df
