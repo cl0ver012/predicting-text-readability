@@ -421,3 +421,15 @@ def pos_features(df):
     
     return df
 
+
+# REMOVE AUX. FEATURES
+
+
+def remove_aux_features(df):
+    """
+    Removes all auxillary features.
+    """
+    
+    df.drop(columns=["Tokens", "Words", "Sentences", "N_words", "N_sentences", "N_syllables", "N_polysyllables"], inplace=True)
+    
+    return df
