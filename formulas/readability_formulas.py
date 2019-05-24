@@ -9,11 +9,9 @@ Formulas implemented:
 - Flesch formula
 - Dale-Chall formula
 - Gunning fog index
-- SMOG grade
 
 The functions will calculate the formula for every text in the dataframe, creating a column with the result.
 """
-import numpy as np
 
 
 # FLESCH 
@@ -25,16 +23,15 @@ def flesch(df):
     The formula and its interpretation is given in this wiki page: https://en.wikipedia.org/wiki/Flesch%E2%80%93Kincaid_readability_tests
     
     Needed features:
-    N_words
-    N_sentences
-    N_syllables
+    Avg_words_per_sentence
+    Avg_syllables_per_word
     
     Adds column:
     Flesch - Flesch formula score for the text 
     """
     
     # Flesch formula
-    df["Flesch"] = 206.835 - 1.015 * (df["N_words"] / df["N_sentences"]) - 84.6 * (df["N_syllables"] / df["N_words"])
+    df["Flesch"] = 206.835 - 1.015 * df["Avg_words_per_sentence"] - 84.6 * df["Avg_syllables_per_word"]
     
     return df
 
@@ -48,8 +45,7 @@ def dale_chall(df):
     The formula and its interpretation is given in this wiki page: https://en.wikipedia.org/wiki/Dale%E2%80%93Chall_readability_formula
     
     Needed features:
-    N_words
-    N_sentences
+    Avg_words_per_sentence
     Difficult_word_percent
     
     Adds column:
@@ -57,7 +53,7 @@ def dale_chall(df):
     """
 
     # Dale-Chall formula
-    df["Dale_Chall"] = 0.1579 * (df["Difficult_word_percent"] * 100) + 0.0496 * (df["N_words"] / df["N_sentences"])
+    df["Dale_Chall"] = 0.1579 * (df["Difficult_word_percent"] * 100) + 0.0496 * df["Avg_words_per_sentence"]
     
     # adjust if percentage of difficul words is greater than 5%
     df.loc[df["Difficult_word_percent"] > 0.05, "Dale_Chall"] += 3.6365
@@ -74,8 +70,7 @@ def gunning_fog(df):
     The formula and its interpretation is given in this wiki page: https://en.wikipedia.org/wiki/Gunning_fog_index
     
     Needed features:
-    N_words
-    N_sentences
+    Avg_words_per_sentence
     Complex_words_percent
     
     Adds column:
@@ -83,30 +78,6 @@ def gunning_fog(df):
     """
 
     # Gunning fog formula
-    df["Gunning_fog"] = 0.4 * (df["N_words"] / df["N_sentences"] + 100 * df["Complex_word_percent"])
-    
-    return df
-
-
-# SMOG
-
-
-def smog(df):
-    """
-    Calculates the Smog grade for each text.
-    The formula and its interpretation is given in this wiki page: https://en.wikipedia.org/wiki/SMOG
-    
-    Needed features:
-    N_sentences
-    N_polysyllables
-    
-    Adds column:
-    Smog - Smog grade for the text 
-    """
-
-    # Smog formula
-    df["Smog"] = df["N_polysyllables"] * 30 / df["N_sentences"]
-    df["Smog"] = df["Smog"].apply(np.sqrt)
-    df["Smog"] = 1.0430 * df["Smog"] + 3.1291
+    df["Gunning_fog"] = 0.4 * (df["Avg_words_per_sentence"] + 100 * df["Complex_word_percent"])
     
     return df
