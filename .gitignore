@@ -1,8 +1,16 @@
+# dataset
 data/WeeBit/
 data/weebit.csv
 data/weebit_train.csv
 data/weebit_test.csv
+
+# features
 features/weebit_train_with_features.csv
 features/weebit_test_with_features.csv
+
+# saved ML models
+ml_models/models/saved_models
+
+# other
 **/__pycache__/
 .ipynb_checkpoints

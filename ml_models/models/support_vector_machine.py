@@ -1,16 +1,15 @@
-from xgboost import XGBClassifier
+from sklearn.svm import SVC
 import pickle
 
 
-class XGBoost():
+class SupportVectorMachine():
     """
-    Class for the XGBoost classifier. 
+    Class for the Support Vector Machine (SVM) classifier.
     
-    A wrapper for the xgboost implemenation.
+    A wrapper for the sklearn implementation.
     """
     
-    def __init__(self, max_depth=30, n_estimators=200, learning_rate=0.1,
-                 save_model=False, use_saved_model=False, model_path='./models/saved_models/xgboost.pickle'):
+    def __init__(self, kernel='linear', C=10.0, save_model=False, use_saved_model=False, model_path='./models/saved_models/svm.pickle'):
         self.model_path = model_path
         self.save_model = save_model
         
@@ -18,7 +17,7 @@ class XGBoost():
             with open(self.model_path, 'rb') as file:
                 self.model = pickle.load(file)
         else:
-            self.model = xgboost = XGBClassifier(max_depth=max_depth, n_estimators=n_estimators, learning_rate=learning_rate)  
+            self.model = SVC(kernel=kernel, C=C)
     
     
     def fit(self, X_train, y_train):
