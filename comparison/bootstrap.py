@@ -4,7 +4,7 @@ Functions for performing the statistical comparison using boostrap.
 import numpy as np
 
 
-def bootstrap_significance_testing(y_true, y_predA, y_predB, metric, n=int(1e6)):
+def bootstrap_significance_testing(y_true, y_predA, y_predB, metric, n=int(1e5)):
     """
     Perform bootstrap significance testing.
     
