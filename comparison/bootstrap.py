@@ -9,6 +9,7 @@ def bootstrap_significance_testing(y_true, y_predA, y_predB, metric, n=int(1e5))
     Perform bootstrap significance testing.
     
     Null hypothesis is: A is no better than B on the population as a whole.
+    Alternative hypothesis: A is better than B on the population as a whole.
     
     The return value is the p-value for this test.
     The bootstrap estimates the p-value though a combination of simulation and approximation.
