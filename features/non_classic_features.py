@@ -8,7 +8,15 @@ The functions will calculate the features for every text in the dataframe, creat
 To work, some functions need auxillary features; requirements for each function are written in its description.
 
 List of non-classic features:
-- 
+- NP_per_sent
+- VP_per_sent
+- PP_per_sent
+- SBAR_per_sent
+- SBARQ_per_sent
+- avg_NP_size
+- avg_VP_size
+- avg_PP_size
+- avg_parse_tree
 
 List of Auxillary features (features used to calculate other features):
 - Tokens
