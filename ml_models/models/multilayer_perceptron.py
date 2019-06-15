@@ -6,6 +6,7 @@ from keras.optimizers import Adam
 import numpy as np
 import tensorflow as tf
 
+from .utils.utils import discretize
 
 class MultilayerPerceptron():
     """
@@ -46,7 +47,7 @@ class MultilayerPerceptron():
         y_pred_cat = self.model.predict(X_test)
         y_pred = np.argmax(y_pred_cat, axis=1)
         
-        return y_pred
+        return discretize(y_pred)
     
     
     def _make_model(self):
@@ -57,14 +58,14 @@ class MultilayerPerceptron():
         model.add(Dropout(0.2))
         model.add(Dense(32, activation='relu'))
         model.add(Dropout(0.2))
-        model.add(Dense(5, activation='softmax'))
+        model.add(Dense(5, activation='linear'))
         
         # opitimizer
         adam = Adam(lr=0.001)
         
         model.compile(optimizer=adam,
-              loss='categorical_crossentropy',
-              metrics=['accuracy'])
+              loss='mse',
+              metrics=['mse'])
         
         return model
         

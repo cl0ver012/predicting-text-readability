@@ -1,5 +1,7 @@
-from sklearn.svm import SVC
+from sklearn.svm import SVR
 import pickle
+
+from .utils.utils import discretize
 
 
 class SupportVectorMachine():
@@ -17,7 +19,7 @@ class SupportVectorMachine():
             with open(self.model_path, 'rb') as file:
                 self.model = pickle.load(file)
         else:
-            self.model = SVC(kernel=kernel, C=C)
+            self.model = SVR(kernel=kernel, C=C)
     
     
     def fit(self, X_train, y_train):
@@ -29,4 +31,13 @@ class SupportVectorMachine():
     
     
     def predict(self, X_test):
-        return self.model.predict(X_test)
+        return discretize(self.model.predict(X_test))
+    
+    
+    def set_hyperparams(self, kernel, c):
+        """
+        Set new hyperparameters. 
+        This will delete the old model and create a new model using the given hyperparams.
+        """
+        
+        self.model = SVR(kernel=kernel, C=c)
